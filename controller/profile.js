@@ -1,4 +1,6 @@
 const Profile = require('../models/Profile');
+const Stackoverflow = require('../models/Stackoverflow');
+const Github = require('../models/Github');
 const User = require('../models/User');
 const normalize = require('normalize-url');
 const dotenv=require('dotenv').config()
@@ -39,14 +41,53 @@ module.exports = {
 			bio,
 			skills,
 			status,
-			githubusername,
-            stackoverflowusername,
+			github:{
+                githubUsername,
+                githubFollowers,
+                repoQuantity
+            },
+            stackoverflow:{
+                stackoverflowUsername,
+                stackoverflowId,
+                reputation,
+                goldBadges,
+                silverBadges,
+                bronzeBadges
+            },
 			youtube,
 			twitter,
 			instagram,
 			linkedin,
 			facebook,
+            gistPublicCodes,
+            views
         } = req.body;
+
+        let git = await Github.findOneAndUpdate(
+            { username: github.githubUsername },
+            { $set: 
+                {
+                    username: github.githubUsername, 
+                    followers: github.githubFollowers, 
+                    repo_quantity: github.repoQuantity
+                } 
+            },
+            { new: true, upsert: true }
+        );
+
+        let stack = await Stackoverflow.findOneAndUpdate(
+            { username: stackoverflow.stackoverflowUsername },
+            { $set: 
+                {   username: stackoverflow.stackoverflowUsername, 
+                    stackoverflow_id: stackoverflow.stackoverflowId, 
+                    reputation: stackoverflow.reputation,
+                    gold_badges: stackoverflow.goldBadges,
+                    silver_badges: stackoverflow.silverBadges,
+                    bronze_badges: Stackoverflow.bronzeBadges
+                } 
+            },
+            { new: true, upsert: true }
+        );
 
 		const profileFields = {
 			user: req.user.id,
@@ -61,8 +102,6 @@ module.exports = {
 				? skills
 				: skills.split(',').map(skill => ' ' + skill.trim()),
 			status,
-			githubusername,
-            stackoverflowusername,
 		};
 
 		// Build social object and add to profileFields
@@ -79,6 +118,10 @@ module.exports = {
 				socialfields[key] = normalize(value, { forceHttps: true });
 		}
 		profileFields.social = socialfields;
+        profileFields.github = git._id;
+        profileFields.stackoverflow = stack._id;
+        profileFields.gist_public_codes = gistPublicCodes;
+        profileFields.views = views;
 
 		try {
 			let profile = await Profile.findOneAndUpdate(
