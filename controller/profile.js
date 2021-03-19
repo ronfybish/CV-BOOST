@@ -41,19 +41,6 @@ module.exports = {
 			bio,
 			skills,
 			status,
-			github:{
-                githubUsername,
-                githubFollowers,
-                repoQuantity
-            },
-            stackoverflow:{
-                stackoverflowUsername,
-                stackoverflowId,
-                reputation,
-                goldBadges,
-                silverBadges,
-                bronzeBadges
-            },
 			youtube,
 			twitter,
 			instagram,
@@ -64,26 +51,26 @@ module.exports = {
         } = req.body;
 
         let git = await Github.findOneAndUpdate(
-            { username: github.githubUsername },
+            { username: req.body.github.githubUsername },
             { $set: 
                 {
-                    username: github.githubUsername, 
-                    followers: github.githubFollowers, 
-                    repo_quantity: github.repoQuantity
+                    username: req.body.github.githubUsername, 
+                    followers: req.body.github.githubFollowers, 
+                    repo_quantity: req.body.github.repoQuantity
                 } 
             },
             { new: true, upsert: true }
         );
 
         let stack = await Stackoverflow.findOneAndUpdate(
-            { username: stackoverflow.stackoverflowUsername },
+            { username: req.body.stackoverflow.stackoverflowUsername },
             { $set: 
-                {   username: stackoverflow.stackoverflowUsername, 
-                    stackoverflow_id: stackoverflow.stackoverflowId, 
-                    reputation: stackoverflow.reputation,
-                    gold_badges: stackoverflow.goldBadges,
-                    silver_badges: stackoverflow.silverBadges,
-                    bronze_badges: Stackoverflow.bronzeBadges
+                {   username: req.body.stackoverflow.stackoverflowUsername, 
+                    stackoverflow_id: req.body.stackoverflow.stackoverflowId, 
+                    reputation: req.body.stackoverflow.reputation,
+                    gold_badges: req.body.stackoverflow.goldBadges,
+                    silver_badges: req.body.stackoverflow.silverBadges,
+                    bronze_badges: req.body.stackoverflow.bronzeBadges
                 } 
             },
             { new: true, upsert: true }
