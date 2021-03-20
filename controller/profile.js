@@ -46,7 +46,6 @@ module.exports = {
 			instagram,
 			linkedin,
 			facebook,
-            gistPublicCodes,
             views
         } = req.body;
 
@@ -54,9 +53,13 @@ module.exports = {
             { username: req.body.github.githubUsername },
             { $set: 
                 {
+					user_id: req.body.github.userId,
                     username: req.body.github.githubUsername, 
                     followers: req.body.github.githubFollowers, 
-                    repo_quantity: req.body.github.repoQuantity
+					following: req.body.github.githubFollowing, 
+                    repo_quantity: req.body.github.repoQuantity,
+					public_gist_quantity: req.body.github.publicGistQuantity
+
                 } 
             },
             { new: true, upsert: true }
