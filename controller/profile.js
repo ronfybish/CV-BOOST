@@ -50,15 +50,15 @@ module.exports = {
         } = req.body;
 
         let git = await Github.findOneAndUpdate(
-            { username: req.body.github.githubUsername },
+            { username: req.body.github.username },
             { $set: 
                 {
-					user_id: req.body.github.userId,
-                    username: req.body.github.githubUsername, 
-                    followers: req.body.github.githubFollowers, 
-					following: req.body.github.githubFollowing, 
-                    repo_quantity: req.body.github.repoQuantity,
-					public_gist_quantity: req.body.github.publicGistQuantity
+					user_id: req.body.github.user_id,
+                    username: req.body.github.username, 
+                    followers: req.body.github.followers, 
+					following: req.body.github.following, 
+                    repo_quantity: req.body.github.repo_quantity,
+					public_gist_quantity: req.body.github.public_gist_quantity
 
                 } 
             },
@@ -66,15 +66,15 @@ module.exports = {
         );
 
         let stack = await Stackoverflow.findOneAndUpdate(
-            { username: req.body.stackoverflow.stackoverflowUsername },
+            { username: req.body.stackoverflow.username },
             { $set: 
                 {  
-					 username: req.body.stackoverflow.stackoverflowUsername, 
-                    stackoverflow_id: req.body.stackoverflow.stackoverflowId, 
+					username: req.body.stackoverflow.username, 
+                    stackoverflow_id: req.body.stackoverflow.stackoverflow_id, 
                     reputation: req.body.stackoverflow.reputation,
-                    gold_badges: req.body.stackoverflow.goldBadges,
-                    silver_badges: req.body.stackoverflow.silverBadges,
-                    bronze_badges: req.body.stackoverflow.bronzeBadges
+                    gold_badges: req.body.stackoverflow.gold_badges,
+                    silver_badges: req.body.stackoverflow.silver_badges,
+                    bronze_badges: req.body.stackoverflow.bronze_badges
                 } 
             },
             { new: true, upsert: true }
@@ -111,7 +111,7 @@ module.exports = {
 		profileFields.social = socialfields;
         profileFields.github= git._id;
         profileFields.stackoverflow = stack._id;
-        profileFields.gist_public_codes = req.body.github.publicGistQuantity;
+        profileFields.gist_public_codes = req.body.github.public_gist_quantity;
         profileFields.views = views;
 
 		try {
