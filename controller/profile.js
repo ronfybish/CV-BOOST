@@ -109,8 +109,8 @@ module.exports = {
 				socialfields[key] = normalize(value, { forceHttps: true });
 		}
 		profileFields.social = socialfields;
-        profileFields.github_doc_id = git._id;
-        profileFields.stackoverflow_doc_id = stack._id;
+        profileFields.github= git._id;
+        profileFields.stackoverflow = stack._id;
         profileFields.gist_public_codes = req.body.github.publicGistQuantity;
         profileFields.views = views;
 
@@ -120,10 +120,7 @@ module.exports = {
 				{ $set: profileFields },
 				{ new: true, upsert: true }
 			);
-			const profileData = Object.assign({}, profile);
-			profileData._doc.github_data = git;
-			profileData._doc.stackoverflow_data = stack;
-			res.status(200).json(profileData._doc);
+			res.status(200).send({});
 		} catch (error) {
 			console.error(error.message);
 			res.status(500).json({
@@ -150,10 +147,13 @@ module.exports = {
 
 	getAllProfiles: async (req, res) => {
 		try {
-			const profiles = await Profile.find().populate('user', [
+			const profiles = await Profile.find()
+			.populate('user', [
 				'name',
 				'avatar',
-			]);
+			])
+			.populate('github')
+			.populate('stackoverflow');
 			res.status(200).json(profiles);
 		} catch (err) {
 			console.error(error.message);
