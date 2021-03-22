@@ -109,9 +109,9 @@ module.exports = {
 				socialfields[key] = normalize(value, { forceHttps: true });
 		}
 		profileFields.social = socialfields;
-        profileFields.github = git._id;
-        profileFields.stackoverflow = stack._id;
-        profileFields.gist_public_codes = gistPublicCodes;
+        profileFields.github_doc_id = git._id;
+        profileFields.stackoverflow_doc_id = stack._id;
+        profileFields.gist_public_codes = req.body.github.publicGistQuantity;
         profileFields.views = views;
 
 		try {
@@ -120,23 +120,10 @@ module.exports = {
 				{ $set: profileFields },
 				{ new: true, upsert: true }
 			);
-			profile.github = {
-				user_id: req.body.github.userId,
-				username: req.body.github.githubUsername, 
-				followers: req.body.github.githubFollowers, 
-				following: req.body.github.githubFollowing, 
-				repo_quantity: req.body.github.repoQuantity,
-				public_gist_quantity: req.body.github.publicGistQuantity
-			}
-			profile.stackoverflow = {
-				username: req.body.stackoverflow.stackoverflowUsername, 
-				stackoverflow_id: req.body.stackoverflow.stackoverflowId, 
-				reputation: req.body.stackoverflow.reputation,
-				gold_badges: req.body.stackoverflow.goldBadges,
-				silver_badges: req.body.stackoverflow.silverBadges,
-				bronze_badges: req.body.stackoverflow.bronzeBadges
-			}
-			res.status(200).json(profile);
+			const profileData = Object.assign({}, profile);
+			profileData._doc.github_data = git;
+			profileData._doc.stackoverflow_data = stack;
+			res.status(200).json(profileData._doc);
 		} catch (error) {
 			console.error(error.message);
 			res.status(500).json({
