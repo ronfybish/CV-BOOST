@@ -68,7 +68,8 @@ module.exports = {
         let stack = await Stackoverflow.findOneAndUpdate(
             { username: req.body.stackoverflow.stackoverflowUsername },
             { $set: 
-                {   username: req.body.stackoverflow.stackoverflowUsername, 
+                {  
+					 username: req.body.stackoverflow.stackoverflowUsername, 
                     stackoverflow_id: req.body.stackoverflow.stackoverflowId, 
                     reputation: req.body.stackoverflow.reputation,
                     gold_badges: req.body.stackoverflow.goldBadges,
@@ -119,6 +120,22 @@ module.exports = {
 				{ $set: profileFields },
 				{ new: true, upsert: true }
 			);
+			profile.github = {
+				user_id: req.body.github.userId,
+				username: req.body.github.githubUsername, 
+				followers: req.body.github.githubFollowers, 
+				following: req.body.github.githubFollowing, 
+				repo_quantity: req.body.github.repoQuantity,
+				public_gist_quantity: req.body.github.publicGistQuantity
+			}
+			profile.stackoverflow = {
+				username: req.body.stackoverflow.stackoverflowUsername, 
+				stackoverflow_id: req.body.stackoverflow.stackoverflowId, 
+				reputation: req.body.stackoverflow.reputation,
+				gold_badges: req.body.stackoverflow.goldBadges,
+				silver_badges: req.body.stackoverflow.silverBadges,
+				bronze_badges: req.body.stackoverflow.bronzeBadges
+			}
 			res.status(200).json(profile);
 		} catch (error) {
 			console.error(error.message);

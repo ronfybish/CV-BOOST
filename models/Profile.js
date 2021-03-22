@@ -108,11 +108,11 @@ const ProfileSchema = new mongoose.Schema({
     views: {
         type: Number,
     },
-    github: {
+    github_doc_id: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'github',
 	},
-    stackoverflow: {
+    stackoverflow_doc_id: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'stackoverflow',
 	},
