@@ -116,7 +116,11 @@ const ProfileSchema = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'stackoverflow',
 	},
-	date: {
+	created_at: {
+		type: Date,
+		default: Date.now,
+	},
+	updated_at: {
 		type: Date,
 		default: Date.now,
 	},

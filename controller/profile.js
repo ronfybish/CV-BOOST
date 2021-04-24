@@ -32,6 +32,7 @@ module.exports = {
 	},
 
 	createOrUpdateProfile: async (req, res) => {
+		const profile = await Profile.find({ user: req.user.id}).exec();
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
 			return res.status(400).json({ errors: errors.array() });
@@ -52,15 +53,15 @@ module.exports = {
         } = req.body;
 
         let git = await Github.findOneAndUpdate(
-            { username: req.body.github.username },
+            { username: req.body.github.githubUsername },
             { $set: 
                 {
-					user_id: req.body.github.user_id,
-                    username: req.body.github.username, 
-                    followers: req.body.github.followers, 
-					following: req.body.github.following, 
-                    repo_quantity: req.body.github.repo_quantity,
-					public_gist_quantity: req.body.github.public_gist_quantity
+					user_id: req.body.github.userId,
+                    username: req.body.github.githubUsername, 
+                    followers: req.body.github.githubFollowers, 
+					following: req.body.github.githubFollowing, 
+                    repo_quantity: req.body.github.repoQuantity,
+					public_gist_quantity: req.body.github.publicGistQuantity
 
                 } 
             },
@@ -68,15 +69,15 @@ module.exports = {
         );
 
         let stack = await Stackoverflow.findOneAndUpdate(
-            { username: req.body.stackoverflow.username },
+            { username: req.body.stackoverflow.stackoverflowUsername },
             { $set: 
                 {  
-					username: req.body.stackoverflow.username, 
-                    stackoverflow_id: req.body.stackoverflow.stackoverflow_id, 
+					username: req.body.stackoverflow.stackoverflowUsername, 
+                    stackoverflow_id: req.body.stackoverflow.stackoverflowId, 
                     reputation: req.body.stackoverflow.reputation,
-                    gold_badges: req.body.stackoverflow.gold_badges,
-                    silver_badges: req.body.stackoverflow.silver_badges,
-                    bronze_badges: req.body.stackoverflow.bronze_badges
+                    gold_badges: req.body.stackoverflow.goldBadges,
+                    silver_badges: req.body.stackoverflow.silverBadges,
+                    bronze_badges: req.body.stackoverflow.bronzeBadges
                 } 
             },
             { new: true, upsert: true }
@@ -115,9 +116,11 @@ module.exports = {
         profileFields.stackoverflow = stack._id;
         profileFields.gist_public_codes = req.body.github.public_gist_quantity;
         profileFields.views = views;
+		if(!profile.length) profileFields.created_at = new Date();
+		profileFields.updated_at = new Date();
 
 		try {
-			let profile = await Profile.findOneAndUpdate(
+				await Profile.findOneAndUpdate(
 				{ user: req.user.id },
 				{ $set: profileFields },
 				{ new: true, upsert: true }
