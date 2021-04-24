@@ -84,8 +84,7 @@ module.exports = {
 			twitter,
 			instagram,
 			linkedin,
-			facebook,
-            views
+			facebook
         } = req.body;
 
         let git = await Github.findOneAndUpdate(
@@ -151,9 +150,11 @@ module.exports = {
         profileFields.github= git._id;
         profileFields.stackoverflow = stack._id;
         profileFields.gist_public_codes = req.body.github.public_gist_quantity;
-        profileFields.views = views;
 		if(!profile.length) {
 			profileFields.created_at = new Date();
+			profileFields.views = 0;
+		}
+		if(profile.length) {
 			profileFields.views = profile[0].views;
 		}
 		profileFields.updated_at = new Date();
