@@ -7,6 +7,42 @@ const dotenv=require('dotenv').config()
 const axios = require('axios');
 const { validationResult } = require('express-validator');
 
+const generateScore = (stack, git) => {
+let score = 0;
+
+if(stack.bronze_badges > 10) score +=2;
+else score ++;
+
+if(stack.silver_badges > 10) score +=3;
+else score +=2;
+
+if(stack.gold_badges > 10) score +=4;
+else score +=3;
+
+if(stack.reputation > 10 && stack.reputation < 20) score +=2;
+else if(stack.reputation > 20 && stack.reputation < 30) score +=3;
+else score +=5;
+
+if(git.followers > 10 && git.followers < 20) score +=2;
+else if(git.followers > 20 && git.followers < 30) score +=3;
+else score +=5;
+
+if(git.following > 10 && git.following < 20) score +=2;
+else if(git.following > 20 && git.following < 30) score +=3;
+else score +=5;
+
+if(git.public_gist_quantity > 10 && git.public_gist_quantity < 20) score +=2;
+else if(git.public_gist_quantity > 20 && git.public_gist_quantity < 30) score +=3;
+else score +=5;
+
+if(git.repo_quantity > 10 && git.repo_quantity < 20) score +=2;
+else if(git.repo_quantity > 20 && git.repo_quantity < 30) score +=3;
+else score +=5;
+
+return score;
+
+}
+
 module.exports = {
 	getCurrentProfile: async (req, res) => {
 		try {
@@ -116,8 +152,12 @@ module.exports = {
         profileFields.stackoverflow = stack._id;
         profileFields.gist_public_codes = req.body.github.public_gist_quantity;
         profileFields.views = views;
-		if(!profile.length) profileFields.created_at = new Date();
+		if(!profile.length) {
+			profileFields.created_at = new Date();
+			profileFields.views = profile[0].views;
+		}
 		profileFields.updated_at = new Date();
+		profileFields.score = generateScore(stack, git);
 
 		try {
 				await Profile.findOneAndUpdate(
@@ -174,8 +214,6 @@ module.exports = {
 			const profile = await Profile.findOne({
 				user: user_id,
 			}).populate('user', ['name', 'avatar']);
-
-			console.log(profile);
 
 			if (!profile)
 				return res.status(400).json({ msg: 'Profile not found' });

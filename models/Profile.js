@@ -107,6 +107,7 @@ const ProfileSchema = new mongoose.Schema({
     },
     views: {
         type: Number,
+		default: 0
     },
     github: {
 		type: mongoose.Schema.Types.ObjectId,
@@ -115,6 +116,10 @@ const ProfileSchema = new mongoose.Schema({
     stackoverflow: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'stackoverflow',
+	},
+	score: {
+		type: Number,
+		default: 0
 	},
 	created_at: {
 		type: Date,
