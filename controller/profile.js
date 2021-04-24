@@ -175,9 +175,18 @@ module.exports = {
 				user: user_id,
 			}).populate('user', ['name', 'avatar']);
 
+			console.log(profile);
+
 			if (!profile)
 				return res.status(400).json({ msg: 'Profile not found' });
-
+			else{
+				profile.views++;
+				profile.updated_at = new Date();
+				await Profile.findOneAndUpdate(
+					{ user: user_id },
+					{ $set: profile },
+					{ new: true, upsert: true })
+			}
 			return res.status(200).json(profile);
 		} catch (error) {
 			console.error(error.message);
