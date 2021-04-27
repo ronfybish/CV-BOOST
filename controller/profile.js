@@ -46,13 +46,19 @@ return score;
 module.exports = {
 	getCurrentProfile: async (req, res) => {
 		try {
+			console.log("user from request:"+req.user.id);
+
 			const profile = await Profile.findOne({
 				user: req.user.id,
 			}).populate('user', ['name', 'avatar'])
 			.populate('github')
 			.populate('stackoverflow');
 
+			console.log("profile:"+profile);
+
 			if (!profile) {
+				console.log("no profile");
+
 				return res
 					.status(400)
 					.json({ msg: 'There is no profile for this user' });
@@ -87,6 +93,9 @@ module.exports = {
 			facebook
         } = req.body;
 
+		if(req.body.github!=undefined && req.body.github.githubUsername !=undefined )
+		{
+		
         let git = await Github.findOneAndUpdate(
             { username: req.body.github.githubUsername },
             { $set: 
@@ -102,7 +111,10 @@ module.exports = {
             },
             { new: true, upsert: true }
         );
+		}
 
+		if(req.body.stackoverflow != undefined)
+		{
         let stack = await Stackoverflow.findOneAndUpdate(
             { username: req.body.stackoverflow.stackoverflowUsername },
             { $set: 
@@ -117,6 +129,7 @@ module.exports = {
             },
             { new: true, upsert: true }
         );
+		}
 
 		const profileFields = {
 			user: req.user.id,
@@ -147,8 +160,10 @@ module.exports = {
 				socialfields[key] = normalize(value, { forceHttps: true });
 		}
 		profileFields.social = socialfields;
-        profileFields.github= git._id;
-        profileFields.stackoverflow = stack._id;
+		if(typeof git !== 'undefined' && git)
+        	profileFields.github= git._id;
+		if(typeof stack !== 'undefined' && stack)
+        	profileFields.stackoverflow = stack._id;
         profileFields.gist_public_codes = req.body.github.public_gist_quantity;
 		if(!profile.length) {
 			profileFields.created_at = new Date();
@@ -158,9 +173,11 @@ module.exports = {
 			profileFields.views = profile[0].views;
 		}
 		profileFields.updated_at = new Date();
-		profileFields.score = generateScore(stack, git);
+		if((typeof git !== 'undefined' && git)  &&(typeof stack !== 'undefined' && stack))
+			profileFields.score = generateScore(stack, git);
 
 		try {
+				console.log("final profile to update:" +console.log(JSON.stringify(profile, null, 4)));
 				await Profile.findOneAndUpdate(
 				{ user: req.user.id },
 				{ $set: profileFields },
