@@ -93,25 +93,27 @@ module.exports = {
 			facebook
         } = req.body;
 
-		if(req.body.github!=undefined && req.body.github.githubUsername !=undefined )
-		{
-		
+		console.log("***************req**************");
+		str = JSON.stringify(req.body);
+		console.log(str)
         let git = await Github.findOneAndUpdate(
             { username: req.body.github.githubUsername },
             { $set: 
                 {
 					user_id: req.body.github.userId,
-                    username: req.body.github.githubUsername, 
-                    followers: req.body.github.githubFollowers, 
-					following: req.body.github.githubFollowing, 
-                    repo_quantity: req.body.github.repoQuantity,
-					public_gist_quantity: req.body.github.publicGistQuantity
-
+                    username: req.body.github.username, 
+                    followers: req.body.github.followers, 
+					following: req.body.github.following, 
+                    repo_quantity: req.body.github.repo_quantity,
+					public_gist_quantity: req.body.github.public_gist_quantity
                 } 
             },
             { new: true, upsert: true }
         );
-		}
+
+		console.log("***************git**************");
+		str = JSON.stringify(git);
+		console.log(str)
 
 		if(req.body.stackoverflow != undefined)
 		{
