@@ -10,6 +10,8 @@ module.exports = (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_TOKEN);
         req.user = decoded.user;
+        console.log("request user is  : "+JSON.stringify(req.user));
+
         next();
     } catch (error) {
         console.log("token invalid");

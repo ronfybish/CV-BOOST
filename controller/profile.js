@@ -318,10 +318,12 @@ module.exports = {
 	},
 
 	addProfileEducation: async (req, res) => {
+		console.log("*********add education req.body:"+JSON.stringify( req.body));
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
 			return res.status(400).json({ errors: errors.array() });
 		}
+
 
 		const {
 			school,
@@ -344,8 +346,10 @@ module.exports = {
 		};
 
 		try {
-			const profile = await Profile.findOne({ user: req.user.id });
 
+			const profile = await Profile.findOne({ user: req.user.id });
+			console.log("*********newEdu:"+JSON.stringify( newEdu));
+			
 			profile.education.unshift(newEdu);
 
 			await profile.save();
@@ -362,9 +366,12 @@ module.exports = {
 	deleteProfileEducation: async (req, res) => {
 		try {
 			const foundProfile = await Profile.findOne({ user: req.user.id });
+			console.log(req.params.edu_id);
+			/*
 			foundProfile.education = foundProfile.education.filter(
 				edu => edu._id.toString() !== req.params.edu_id
-			);
+			);*/
+			foundProfile.education.splice(req.params.edu_id,1);
 			await foundProfile.save();
 			return res.status(200).json(foundProfile);
 		} catch (error) {
