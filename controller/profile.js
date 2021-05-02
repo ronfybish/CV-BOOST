@@ -73,12 +73,31 @@ module.exports = {
 		}
 	},
 
-	createOrUpdateProfile: async (req, res) => {
-		const profile = await Profile.find({ user: req.user.id}).exec();
-		const errors = validationResult(req);
-		if (!errors.isEmpty()) {
-			return res.status(400).json({ errors: errors.array() });
-		}
+	createProfile: async (req, res) => {
+		const profileFields = {};
+		const socialfields = {
+			youtube: null,
+			twitter: null,
+			instagram: null,
+			linkedin: null,
+			facebook: null
+		};
+		const stackoverflow = {
+			username: null,
+			stackoverflow_id: null,
+			reputation: 0,
+			gold_badges: 0,
+			silver_badges: 0,
+			bronze_badges: 0,
+		};
+		const github = {
+			username: null,
+			user_id: null,
+			followers: 0,
+			following: 0,
+			repo_quantity: 0,
+			public_gist_quantity: 0,
+		};
 		const {
 			company,
 			location,
@@ -86,102 +105,125 @@ module.exports = {
 			bio,
 			skills,
 			status,
-			youtube,
-			twitter,
-			instagram,
-			linkedin,
-			facebook
         } = req.body;
 
-		console.log("***************req**************");
-		str = JSON.stringify(req.body);
-		console.log(str)
-        let git = await Github.findOneAndUpdate(
-            { username: req.body.github.githubUsername },
-            { $set: 
-                {
-					user_id: req.body.github.userId,
-                    username: req.body.github.username, 
-                    followers: req.body.github.followers, 
-					following: req.body.github.following, 
-                    repo_quantity: req.body.github.repo_quantity,
-					public_gist_quantity: req.body.github.public_gist_quantity
-                } 
-            },
-            { new: true, upsert: true }
-        );
-
-		console.log("***************git**************");
-		str = JSON.stringify(git);
-		console.log(str)
-
-		if(req.body.stackoverflow != undefined)
-		{
-        let stack = await Stackoverflow.findOneAndUpdate(
-            { username: req.body.stackoverflow.stackoverflowUsername },
-            { $set: 
-                {  
-					username: req.body.stackoverflow.stackoverflowUsername, 
-                    stackoverflow_id: req.body.stackoverflow.stackoverflowId, 
-                    reputation: req.body.stackoverflow.reputation,
-                    gold_badges: req.body.stackoverflow.goldBadges,
-                    silver_badges: req.body.stackoverflow.silverBadges,
-                    bronze_badges: req.body.stackoverflow.bronzeBadges
-                } 
-            },
-            { new: true, upsert: true }
-        );
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			return res.status(400).json({ errors: errors.array() });
 		}
 
-		const profileFields = {
-			user: req.user.id,
-			company,
-			location,
-			website:
-				website && website !== ''
-					? normalize(website, { forceHttps: true })
-					: '',
-			bio,
-			skills: Array.isArray(skills)
-				? skills
-				: skills.split(',').map(skill => ' ' + skill.trim()),
-			status,
-		};
+		profileFields.company = company || null;
+		profileFields.location = location || null;
+		profileFields.website = website && website !== '' ? normalize(website, { forceHttps: true }) : ''
+		profileFields.bio = bio || null;
+		profileFields.skills = Array.isArray(skills) ? skills : skills.split(',').map(skill => ' ' + skill.trim())
+		profileFields.status = status || null;
+		profileFields.gist_public_codes = req.body.github.public_gist_quantity || null;
 
-		// Build social object and add to profileFields
-		const socialfields = {
-			youtube,
-			twitter,
-			instagram,
-			linkedin,
-			facebook,
-		};
+		if(req.body.social){
+			socialfields.youtube = req.body.social.youtube || null;
+			socialfields.twitter = req.body.social.twitter || null;
+			socialfields.instagram = req.body.social.instagram || null;
+			socialfields.linkedin = req.body.social.linkedin || null;
+			socialfields.facebook = req.body.social.facebook || null;
+		}
+		profileFields.social = socialfields;
+
+		if(req.body.github && req.body.github.username){
+			github.username = req.body.github.username;
+			github.user_id = req.body.github.userId || null;
+			github.followers = req.body.github.followers || 0;
+			github.following = req.body.github.following || 0;
+			github.repo_quantity = req.body.github.repo_quantity || 0;
+			github.public_gist_quantity = req.body.github.public_gist_quantity || 0;
+		}
+
+		if(req.body.stackoverflow && req.body.stackoverflow.username){
+			stackoverflow.username = req.body.stackoverflow.username;
+			stackoverflow.stackoverflow_id = req.body.stackoverflow.stackoverflow_id || null;
+			stackoverflow.reputation = req.body.stackoverflow.reputation || 0;
+			stackoverflow.gold_badges = req.body.stackoverflow.gold_badges || 0;
+			stackoverflow.silver_badges = req.body.stackoverflow.silver_badges || 0;
+			stackoverflow.bronze_badges = req.body.stackoverflow.bronze_badges || 0;
+		}
+
+		profileFields.experience = [];
+		let exp = req.body.experience;
+		if(exp && exp.length){
+			for(let i = 0; i< exp.length; i++){
+				profileFields.experience.push({
+					title: exp[i].title,
+					company: exp[i].company,
+					location: exp[i].location,
+					from: exp[i].from,
+					to: exp[i].to,
+					current: exp[i].current,
+					description: exp[i].description
+				})
+			}
+		}
+
+		profileFields.education = [];
+		let edu = req.body.education;
+		if(edu && edu.length){
+			for(let i = 0; i< edu.length; i++){
+				profileFields.education.push({
+					school: edu[i].school,
+					degree: edu[i].degree,
+					fieldofstudy: edu[i].fieldofstudy,
+					from: edu[i].from,
+					to: edu[i].to,
+					current: edu[i].current,
+					description: edu[i].description,
+				})
+			}
+		}
+
+		profileFields.updated_at = new Date();
+		profileFields.created_at = new Date();
+		profileFields.views = 0;
+		profileFields.score = 0;
+
+		let git;
+		if(github.username){
+			git = await Github.findOneAndUpdate(
+			   { username: req.body.github.username },
+			   { $set: github},
+			   { new: true, upsert: true }
+		   );
+		   profileFields.github= git._id;
+		}
+		else{
+			git = new Github(github);
+			git.save();
+			profileFields.github = git._id;
+		}
+
+		let stack;
+		if(stackoverflow.username){
+			stack = await Stackoverflow.findOneAndUpdate(
+				{ username: req.body.stackoverflow.username },
+				{ $set: stackoverflow},
+				{ new: true, upsert: true }
+			);
+			profileFields.stackoverflow = stack._id;
+		}
+		else{
+			stack = new Stackoverflow(stackoverflow);
+			stack.save();
+			profileFields.stackoverflow = stack._id;
+		}
+
+		if(git && stack) profileFields.score = generateScore(stack, git);
 
 		for (const [key, value] of Object.entries(socialfields)) {
 			if (value && value.length > 0)
 				socialfields[key] = normalize(value, { forceHttps: true });
 		}
-		profileFields.social = socialfields;
-		if(typeof git !== 'undefined' && git)
-        	profileFields.github= git._id;
-		if(typeof stack !== 'undefined' && stack)
-        	profileFields.stackoverflow = stack._id;
-        profileFields.gist_public_codes = req.body.github.public_gist_quantity;
-		if(!profile.length) {
-			profileFields.created_at = new Date();
-			profileFields.views = 0;
-		}
-		if(profile.length) {
-			profileFields.views = profile[0].views;
-		}
-		profileFields.updated_at = new Date();
-		if((typeof git !== 'undefined' && git)  &&(typeof stack !== 'undefined' && stack))
-			profileFields.score = generateScore(stack, git);
 
 		try {
-				console.log("final profile to update:" +console.log(JSON.stringify(profile, null, 4)));
 				await Profile.findOneAndUpdate(
-				{ user: req.user.id },
+				{ user: req.user.id},
 				{ $set: profileFields },
 				{ new: true, upsert: true }
 			);
@@ -189,7 +231,50 @@ module.exports = {
 		} catch (error) {
 			console.error(error.message);
 			res.status(500).json({
-				errors: [{ msg: 'Error Server **createOrUpdateProfile**' }],
+				errors: [{ msg: 'Error Server **createProfile**' }],
+			});
+		}
+	},
+
+	updateProfile: async (req, res) => {
+		const profile = await Profile.find({ user: req.user.id}).exec();
+		const social = {social: profile[0].social};
+		const stackId = profile[0].stackoverflow;
+		const gitId = profile[0].github;
+		const stackoverflow = await Stackoverflow.find({ _id: stackId}).exec();
+		const github = await Github.find({ _id: gitId}).exec();
+		let data = req.body;
+
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			return res.status(400).json({ errors: errors.array() });
+		}
+
+		if(data.stackoverflow){
+			Object.assign(stackoverflow, data.stackoverflow);
+			await Stackoverflow.findOneAndUpdate({ _id: stackId }, {$set: stackoverflow}, { new: true, upsert: true });
+			delete data.stackoverflow;
+		}
+		if(data.github){
+			Object.assign(github, data.github);
+			await Github.findOneAndUpdate({ _id: gitId }, {$set: github}, { new: true, upsert: true });
+			delete data.github;
+		}
+		if(data.social){
+			Object.assign(social.social, data.social);
+			await Profile.findOneAndUpdate({ user: req.user.id }, {$set: social}, { new: true, upsert: true });
+			delete data.social;
+		}
+
+		try {
+			if(data){
+				const profile = await Profile.findOneAndUpdate({ user: req.user.id }, {$set: data}, { new: true, upsert: true });
+				res.status(200).json(profile);
+			}
+		} catch (error) {
+			console.error(error.message);
+			return res.status(500).json({
+				errors: [{ msg: 'Error Server **updateProfile**' }],
 			});
 		}
 	},
@@ -233,7 +318,9 @@ module.exports = {
 		try {
 			const profile = await Profile.findOne({
 				user: user_id,
-			}).populate('user', ['name', 'avatar']);
+			}).populate('user', ['name', 'avatar'])
+				.populate('github')
+				.populate('stackoverflow');
 
 			if (!profile)
 				return res.status(400).json({ msg: 'Profile not found' });

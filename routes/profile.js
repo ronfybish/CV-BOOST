@@ -24,7 +24,8 @@ const educationValidator = [
 
 const {
 	getCurrentProfile,
-	createOrUpdateProfile,
+	createProfile,
+	updateProfile,
 	getAllProfiles,
 	getProfileByUserId,
 	deleteProfile,
@@ -40,7 +41,8 @@ router.get('/', getAllProfiles);
 router.get('/user/:user_id', getProfileByUserId);
 router.get('/github/:username', getUserRepos);
 router.delete('/', auth, deleteProfile);
-router.post('/', [auth, profileValidator], createOrUpdateProfile);
+router.post('/', [auth], createProfile);
+router.put('/update', [auth], updateProfile);
 router.put('/experience', [auth, experienceValidator], addProfileExperience);
 router.put('/education', [auth, educationValidator], addProfileEducation);
 router.delete('/experience/:exp_id', auth, deleteProfileExperience);
