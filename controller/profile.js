@@ -250,14 +250,14 @@ module.exports = {
 			return res.status(400).json({ errors: errors.array() });
 		}
 
-		if(data.stackoverflow){
-			Object.assign(stackoverflow, data.stackoverflow);
-			await Stackoverflow.findOneAndUpdate({ _id: stackId }, {$set: stackoverflow}, { new: true, upsert: true });
+		if(stackoverflow && data.stackoverflow){
+			Object.assign(stackoverflow[0], data.stackoverflow);
+			await Stackoverflow.findOneAndUpdate({ _id: stackId }, {$set: stackoverflow[0]}, { new: true, upsert: true });
 			delete data.stackoverflow;
 		}
-		if(data.github){
-			Object.assign(github, data.github);
-			await Github.findOneAndUpdate({ _id: gitId }, {$set: github}, { new: true, upsert: true });
+		if(github && data.github){
+			Object.assign(github[0], data.github);
+			await Github.findOneAndUpdate({ _id: gitId }, {$set: github[0]}, { new: true, upsert: true });
 			delete data.github;
 		}
 		if(data.social){
