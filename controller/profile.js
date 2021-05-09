@@ -256,7 +256,7 @@ module.exports = {
 			delete data.stackoverflow;
 		}
 		if(github && data.github){
-			Object.assign(github[0], data.github);
+			// Object.assign(github[0], data.github);
 			await Github.findOneAndUpdate({ _id: gitId }, {$set: data.github}, { new: true, upsert: true });
 			delete data.github;
 		}
