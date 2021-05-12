@@ -389,11 +389,12 @@ module.exports = {
 	deleteProfileExperience: async (req, res) => {
 		try {
 			const foundProfile = await Profile.findOne({ user: req.user.id });
-
+/*
 			foundProfile.experience = foundProfile.experience.filter(
 				exp => exp._id.toString() !== req.params.exp_id
 			);
-
+			*/
+			foundProfile.experience.splice(req.params.edu_id,1);
 			await foundProfile.save();
 			return res.status(200).json(foundProfile);
 		} catch (error) {
