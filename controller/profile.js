@@ -296,6 +296,7 @@ module.exports = {
 	},
 
 	getAllProfiles: async (req, res) => {
+		console.log("HELLO");
 		try {
 			const profiles = await Profile.find()
 			.populate('user', [
