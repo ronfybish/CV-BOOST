@@ -267,7 +267,6 @@ module.exports = {
 		}
 
 		data.updated_at = new Date();
-		console.log(data);
 
 		try {
 			if(data){
