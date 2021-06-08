@@ -266,6 +266,7 @@ module.exports = {
 			delete data.social;
 		}
 
+		data.updated_at = new Date();
 		console.log(data);
 
 		try {
