@@ -266,6 +266,8 @@ module.exports = {
 			delete data.social;
 		}
 
+		console.log(data);
+
 		try {
 			if(data){
 				const profile = await Profile.findOneAndUpdate({ user: req.user.id }, {$set: data}, { new: true, upsert: true });
