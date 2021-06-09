@@ -247,22 +247,17 @@ module.exports = {
 
 		console.log("DATAADAT", data);
 
-		const scoreObj = {
-			github: github, 
-			stackoverflow: stackoverflow
-		};
-
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
 			return res.status(400).json({ errors: errors.array() });
 		}
 
 		if(stackoverflow && data.stackoverflow){
-			scoreObj.stackoverflow = await Stackoverflow.findOneAndUpdate({ _id: stackId }, {$set: data.stackoverflow}, { new: true, upsert: true });
+			await Stackoverflow.findOneAndUpdate({ _id: stackId }, {$set: data.stackoverflow}, { new: true, upsert: true });
 			delete data.stackoverflow;
 		}
 		if(github && data.github){
-			scoreObj.github = await Github.findOneAndUpdate({ _id: gitId }, {$set: data.github}, { new: true, upsert: true });
+			await Github.findOneAndUpdate({ _id: gitId }, {$set: data.github}, { new: true, upsert: true });
 			delete data.github;
 		}
 		if(data.social){
@@ -272,7 +267,12 @@ module.exports = {
 		}
 
 		data.updated_at = new Date();
-		data.score = generateScore(scoreObj.stackoverflow, scoreObj.github);
+		if(!data.stackoverflow.username && !data.github.username){
+			data.score = 0;
+		}
+		else{			
+			data.score = generateScore(scoreObj.stackoverflow, scoreObj.github);
+		}
 		console.log("=====> BEFORE: ", profile);
 		console.log("======> AFTER: ", data.score);
 
