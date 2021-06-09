@@ -245,8 +245,6 @@ module.exports = {
 		const github = await Github.find({ _id: gitId}).exec();
 		let data = req.body;
 
-		console.log("DATAADAT", data);
-
 		if(!data.stackoverflow.username && !data.github.username){
 			data.score = 0;
 		}
@@ -274,13 +272,10 @@ module.exports = {
 		}
 
 		data.updated_at = new Date();
-		console.log("=======> ", data);
-		console.log("======> AFTER: ", data.score);
 
 		try {
 			if(data){
 				const profile = await Profile.findOneAndUpdate({ user: req.user.id }, {$set: data}, { new: true, upsert: true });
-				console.log(profile);
 				res.status(200).json(profile);
 			}
 		} catch (error) {
