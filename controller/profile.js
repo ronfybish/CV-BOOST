@@ -247,6 +247,13 @@ module.exports = {
 
 		console.log("DATAADAT", data);
 
+		if(!data.stackoverflow.username && !data.github.username){
+			data.score = 0;
+		}
+		else{			
+			data.score = generateScore(data.stackoverflow, data.github);
+		}
+
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
 			return res.status(400).json({ errors: errors.array() });
@@ -268,13 +275,6 @@ module.exports = {
 
 		data.updated_at = new Date();
 		console.log("=======> ", data);
-		if(!data.stackoverflow.username && !data.github.username){
-			data.score = 0;
-		}
-		else{			
-			data.score = generateScore(data.stackoverflow, data.github);
-		}
-		console.log("=====> BEFORE: ", profile);
 		console.log("======> AFTER: ", data.score);
 
 		try {
