@@ -245,6 +245,8 @@ module.exports = {
 		const github = await Github.find({ _id: gitId}).exec();
 		let data = req.body;
 
+		console.log("DATAADAT", data);
+
 		const scoreObj = {
 			github: github, 
 			stackoverflow: stackoverflow
