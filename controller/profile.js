@@ -271,7 +271,7 @@ module.exports = {
 			data.score = 0;
 		}
 		else{			
-			data.score = generateScore(scoreObj.stackoverflow, scoreObj.github);
+			data.score = generateScore(data.stackoverflow, data.github);
 		}
 		console.log("=====> BEFORE: ", profile);
 		console.log("======> AFTER: ", data.score);
