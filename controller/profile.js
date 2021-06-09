@@ -271,7 +271,7 @@ module.exports = {
 
 		data.updated_at = new Date();
 		data.score = generateScore(scoreObj.stackoverflow, scoreObj.github);
-		console.log("=====> BEFORE: ", profile.score);
+		console.log("=====> BEFORE: ", profile);
 		console.log("======> AFTER: ", data.score);
 
 		try {
