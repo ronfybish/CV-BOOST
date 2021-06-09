@@ -222,12 +222,12 @@ module.exports = {
 		}
 
 		try {
-				await Profile.findOneAndUpdate(
+				const profile = await Profile.findOneAndUpdate(
 				{ user: req.user.id},
 				{ $set: profileFields },
 				{ new: true, upsert: true }
 			);
-			res.status(200).send({});
+			res.status(200).json(profile);
 		} catch (error) {
 			console.error(error.message);
 			res.status(500).json({
