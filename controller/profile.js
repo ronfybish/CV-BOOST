@@ -267,6 +267,7 @@ module.exports = {
 		}
 
 		data.updated_at = new Date();
+		console.log("=======> ", data);
 		if(!data.stackoverflow.username && !data.github.username){
 			data.score = 0;
 		}
