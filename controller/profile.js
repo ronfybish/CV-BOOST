@@ -271,6 +271,7 @@ module.exports = {
 		try {
 			if(data){
 				const profile = await Profile.findOneAndUpdate({ user: req.user.id }, {$set: data}, { new: true, upsert: true });
+				console.log(profile);
 				res.status(200).json(profile);
 			}
 		} catch (error) {
