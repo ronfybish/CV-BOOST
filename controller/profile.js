@@ -19,24 +19,24 @@ else score +=2;
 if(stack.gold_badges > 10) score +=4;
 else score +=3;
 
-if(stack.reputation > 10 && stack.reputation < 20) score +=2;
-else if(stack.reputation > 20 && stack.reputation < 30) score +=3;
+if(stack.reputation > 0 && stack.reputation < 10) score +=2;
+else if(stack.reputation > 10 && stack.reputation < 100) score +=3;
 else score +=5;
 
-if(git.followers > 10 && git.followers < 20) score +=2;
-else if(git.followers > 20 && git.followers < 30) score +=3;
+if(git.followers > 0 && git.followers < 10) score +=2;
+else if(git.followers > 10 && git.followers < 100) score +=3;
 else score +=5;
 
-if(git.following > 10 && git.following < 20) score +=2;
-else if(git.following > 20 && git.following < 30) score +=3;
+if(git.following > 0 && git.following < 10) score +=2;
+else if(git.following > 10 && git.following < 100) score +=3;
 else score +=5;
 
-if(git.public_gist_quantity > 10 && git.public_gist_quantity < 20) score +=2;
-else if(git.public_gist_quantity > 20 && git.public_gist_quantity < 30) score +=3;
+if(git.public_gist_quantity > 0 && git.public_gist_quantity < 3) score +=2;
+else if(git.public_gist_quantity > 3 && git.public_gist_quantity < 10) score +=3;
 else score +=5;
 
-if(git.repo_quantity > 10 && git.repo_quantity < 20) score +=2;
-else if(git.repo_quantity > 20 && git.repo_quantity < 30) score +=3;
+if(git.repo_quantity > 0 && git.repo_quantity < 3) score +=2;
+else if(git.repo_quantity > 3 && git.repo_quantity < 10) score +=3;
 else score +=5;
 
 return score;
