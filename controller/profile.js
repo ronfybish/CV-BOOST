@@ -107,8 +107,9 @@ module.exports = {
 			status,
         } = req.body;
 
-		const errors = validationResult(req);
-		if (!errors.isEmpty()) {
+		const errors = new Error("Error");
+		// validationResult(req);
+		if (errors) {
 			return res.status(400).json({ errors: errors.array() });
 		}
 
