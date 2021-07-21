@@ -107,9 +107,8 @@ module.exports = {
 			status,
         } = req.body;
 
-		const errors = new Error("Error");
-		// validationResult(req);
-		if (errors) {
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
 			return res.status(400).json({ errors: errors.array() });
 		}
 
@@ -226,9 +225,7 @@ module.exports = {
 				const profile = await Profile.findOneAndUpdate(
 				{ user: req.user.id},
 				{ $set: profileFields },
-				{ new: true, upsert: true }
-			);
-			console.log(profile);
+				{ new: true, upsert: true });
 			res.status(200).json(profile);
 		} catch (error) {
 			console.error(error.message);
