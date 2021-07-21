@@ -227,6 +227,7 @@ module.exports = {
 				{ $set: profileFields },
 				{ new: true, upsert: true }
 			);
+			console.log(profile);
 			res.status(200).json(profile);
 		} catch (error) {
 			console.error(error.message);
